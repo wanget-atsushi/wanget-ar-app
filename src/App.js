@@ -1,75 +1,34 @@
-import React, { useState } from 'react'
-import { supabase } from './supabaseClient'
-import QRCode from 'qrcode'
+import React, { useState } from 'react';
+import { BrowserRouter as Router, Route, Switch } from 'react-router-dom';
+import { supabase } from './supabaseClient';
+import QRCode from 'qrcode.react';
+import ModelViewer from './ModelViewer';
 
 function App() {
-  const [currentModel, setCurrentModel] = useState(null)
-  const [qrCodeUrl, setQrCodeUrl] = useState('')
+  const [qrCode, setQrCode] = useState('');
 
-  const models = [
-    {
-      name: 'Office Chair',
-      glbUrl: '/models/officechair.glb',
-      usdzUrl: '/models/officechair.usdz',
-    },
-    // 他のモデルを追加
-  ]
+  const logEvent = async (modelName, userAgent) => {
+    const { error } = await supabase
+      .from('access_logs')
+      .insert([{ model_name: modelName, user_agent: userAgent, access_time: new Date(), url: window.location.href }]);
 
-  const handleModelClick = async (model) => {
-    setCurrentModel(model)
+    if (error) console.error('Error logging event:', error);
+  };
 
-    // イベントログをSupabaseに送信
-    const { data, error } = await supabase.from('access_logs').insert([
-      {
-        model_name: model.name,
-        user_agent: navigator.userAgent,
-      },
-    ])
-    if (error) console.error('Error inserting log:', error)
-    else console.log('Log inserted:', data)
-
-    // QRコード生成
-    const url = `${window.location.origin}/?model=${model.name}`
-    const qrCodeDataUrl = await QRCode.toDataURL(url)
-    setQrCodeUrl(qrCodeDataUrl)
-  }
+  const generateQrCode = (url) => {
+    setQrCode(url);
+  };
 
   return (
-    <div className="App">
-      <h1>3D Model Viewer with AR</h1>
-      <div className="thumbnails">
-        {models.map((model, index) => (
-          <img
-            key={index}
-            src={model.glbUrl.replace('.glb', '.png')}
-            alt={model.name}
-            onClick={() => handleModelClick(model)}
-            className="thumbnail"
-          />
-        ))}
-      </div>
-
-      {currentModel && (
-        <div className="model-viewer-container">
-          <model-viewer
-            src={currentModel.glbUrl}
-            ios-src={currentModel.usdzUrl}
-            ar
-            ar-modes="scene-viewer quick-look webxr"
-            camera-controls
-            auto-rotate
-            style={{ width: '100%', height: '500px' }}
-          ></model-viewer>
-        </div>
-      )}
-
-      {qrCodeUrl && (
-        <div className="qr-code-container">
-          <img src={qrCodeUrl} alt="QR Code" />
-        </div>
-      )}
-    </div>
-  )
+    <Router>
+      <Switch>
+        <Route exact path="/" component={() => <HomePage logEvent={logEvent} generateQrCode={generateQrCode} />} />
+        <Route path="/model/:modelName" component={ModelViewer} />
+      </Switch>
+      {qrCode && <QRCode value={qrCode} />}
+    </Router>
+  );
 }
 
-export default App
+export default App;
+
