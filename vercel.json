@@ -11,6 +11,10 @@
   ],
   "routes": [
     {
+      "src": "/landing",
+      "dest": "/src/LandingPage.js"
+    },
+    {
       "src": "/(.*)",
       "dest": "/index.html"
     }
