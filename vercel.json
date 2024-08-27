@@ -12,7 +12,7 @@
   "routes": [
     {
       "src": "/landing",
-      "dest": "/src/LandingPage.js"
+      "dest": "/src/components/LandingPage.js"
     },
     {
       "src": "/(.*)",
