@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react';
 import QRCode from 'qrcode.react';
 import { useLocation } from 'react-router-dom';
-import { supabase } from './supabaseClient';
+import { supabase } from '../supabaseClient';
 
 function useQuery() {
   return new URLSearchParams(useLocation().search);
