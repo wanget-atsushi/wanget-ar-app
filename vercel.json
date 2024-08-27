@@ -9,10 +9,15 @@
       }
     }
   ],
+  {
   "routes": [
     {
       "src": "/landing",
       "dest": "/src/components/LandingPage.js"
+    },
+    {
+      "src": "/model-viewer",
+      "dest": "/src/ModelViewer.js"
     },
     {
       "src": "/(.*)",
@@ -20,3 +25,4 @@
     }
   ]
 }
+
